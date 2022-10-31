@@ -17,7 +17,7 @@ for Inorder Traversal
 for Exit
 The src folder contains code for all operations indvidually for better explanation. Although to run this program ,you must excecute the main file i.e. project.c
 
-Group 15 members-
+Group 16 members-
 1. Anshul Mittal (2021CSB1070)
 2. Arpit (2021CSB1074)
 3. Aryaman (2021CSB1074)
