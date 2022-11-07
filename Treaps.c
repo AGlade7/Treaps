@@ -2,9 +2,9 @@
 1. insert - Expected Time complexity O(log n).
 2. search - Expected Time complexity O(log n).
 3. delete - Expected Time complexity O(log n).
-4. Split a treap in two .
-5. Inorder Traversal - which returns all the keys in a sorted arrangement, i.e., in increasing order
-6. Merging the two treaps split earlier
+4. Split a treap - Expected Time complexity O(log n).
+5. Inorder Traversal - The standard bst traversal
+6. Merging the two treaps - Expected Time complexity O(log m+ log n).
 */
 
 #include<stdio.h>
