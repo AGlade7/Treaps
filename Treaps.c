@@ -119,12 +119,12 @@ tnode* delete(tnode *root,int key) {   //function to delete a node
     
     else if(root->left->priority < root->right->priority) {  //Key found and rotations used as per priority
         root = leftrotate(root);                     
-        root->left = delete(root->left, key);
+        root->left = delete(root->left, key);               //Deletion recursively called for left child
     }
     
     else { 
         root = rightrotate(root);
-        root->right = delete(root->right, key);
+        root->right = delete(root->right, key);             //Deletion recursively called for right child
     }
     
     return root;        
@@ -134,31 +134,37 @@ void split(tnode *root, int pivot) { //splitting a treap
     if(search(root,pivot)!=NULL){   
         root=delete(root,pivot);      //If pivot element is present, remove it and then proceed 
         root=insert(root,pivot,0);  
-        l_root = root;             //left sub-treap including the node across which split was performed
+        l_root = root;             //left sub-treap including the node across which split is performed
         r_root = root->right;      //right sub-treap
         root->right = NULL;            
         root = NULL;
 
-        if(l_root->left!=NULL && l_root->right!=NULL){   //THe four cases for splitting such that pivot element always has max priority 
+        if(l_root->left!=NULL && l_root->right!=NULL){   //The four cases for splitting such that pivot element always has max priority 
             if(l_root->left->priority>l_root->right->priority){
-                l_root->priority = l_root->left->priority + 1;
-            }
+                l_root->priority = l_root->left->priority + 1; //To make the priority of root of l_root maximum, we comopare the priorities of it's 
+            }                                                  //two children. The root will get priority = 1 + child which has more priority  
             else{
                 l_root->priority = l_root->right->priority+1;
             }
         }
 
         else if(l_root->left==NULL && l_root->right!=NULL){
-            l_root->priority = l_root->right->priority+1;
+            l_root->priority = l_root->right->priority+1; //One child NULL so priority = priority for only child + 1
         }
 
         else if(l_root->left!=NULL && l_root->right==NULL){
-            l_root->priority = l_root->left->priority+1;
+            l_root->priority = l_root->left->priority+1; //One child NULL so priority = priority for only child + 1
         }
 
         else{
-            l_root->priority = 1;
+            l_root->priority = 1; //No child, so even priority 1 is preffered
         }
+        /*
+            Basically, we are first splitting the treap into two according to the pivot element. The split is like root + left child and right child 
+            Now, while splitting, if the pivot element is itself in the treap, it is removed from the treap and splitted normally.
+            Then, four cases are taken for what should be the priority of the root of the l_root (the left child). Each case does the same thing - 
+            Ensuring that the root key which was removed earlier gets the maximum priority so that it follows max heap property and stays on top, i.e., the root.
+        */
     }
     else{                       //Directly splitted as pivot element was not there in the treap
         root=insert(root,pivot,0);
@@ -169,9 +175,9 @@ void split(tnode *root, int pivot) { //splitting a treap
     }
 }
 
-tnode* merge(tnode *T1, tnode *T2){  //function to merge two trees splitted initially
+tnode* merge(tnode *T1, tnode *T2){  //function to merge two treaps splitted initially
     tnode* root;
-    if(T1==NULL){                  //If one of the treaps is NULL, return the other
+    if(T1==NULL){                  //If one of the treaps is NULL, simply return the other
         return T2;
     }
 
@@ -179,9 +185,9 @@ tnode* merge(tnode *T1, tnode *T2){  //function to merge two trees splitted init
         return T1;
     }
 
-    root = create_node();       //New root 
-    if (T1->priority < T2->priority) { //The treaps merged as per priority
-        root->key = T1->key;
+    root = create_node();       //New root node formed
+    if (T1->priority > T2->priority) { //The treaps merged as per priority
+        root->key = T1->key;   
         root->priority = T1->priority;
         root->left = T1->left;
         root->right=merge(T1->right,T2);
@@ -192,7 +198,12 @@ tnode* merge(tnode *T1, tnode *T2){  //function to merge two trees splitted init
         root->left = merge(T1,T2->left);
         root->right=T2->right;
     }
-
+    /*
+        We make the new node as the root of the treap with higher priority of root. So, we make the root same, take the child opposite to that of the
+        treap (if the split treap was l_root, then we as it is take left child of root as left child of l_root, and if the split treap was r_root, then
+        we take the right child of root as the right child of r_root). So, for the other child, we recursively call merge for other child of the selected
+        treap and the other treap. This is to ensure that the merged treap still follows max heap property.
+    */
     return root;
 }
 
