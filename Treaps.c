@@ -21,7 +21,7 @@ typedef struct TNODE{                   // Structures is basically each node of 
 
 tnode *l_root=NULL, *r_root=NULL, *temp=NULL;
 
-tnode* leftrotate(tnode *root){               // rotating the tree in different manners to make sure that the treap follows the max. heap property
+tnode* leftrotate(tnode *root){               // rotating the treap in different manners to make sure that the treap follows the max. heap property
     tnode* y = root->right;                   
     root->right = y->left;
     y->left = root;
@@ -58,28 +58,28 @@ tnode* search(tnode *root, int value){                      //similar to the bin
     }
 }
 
-tnode* insert(tnode *top, int key, int prior) {        
+tnode* insert(tnode *top, int key, int prior) {        //Insertion of a key
     if(top==NULL) {                                    
         tnode *temp1 = create_node();
         temp1->key = key;
         
-        if(prior==0){
+        if(prior==0){                                   //prior = 0 means the new node has to be on root always
             temp1->priority = RAND_MAX;
         }
-        else{
+        else{                                          //Else random priority, as per the theory of treap which follows max heap property
             temp1->priority = rand();
         }
         return temp1;
     }
 
-    else if(top->key < key) {                             
+    else if(top->key < key) {             //If new key is more than the node we are currently on while recursion, we go to right child as per BST
         top->right = insert(top->right, key, prior);      
         if(top->right->priority > top->priority){         
             top=leftrotate(top);   
         }
     }
 
-    else{                                         
+    else{                                //If new key is less than the node we are currently on while recursion, we go to left child as per BST
         top->left=insert(top->left, key, prior);     
         if(top->left->priority>top->priority){       
             top=rightrotate(top);
@@ -99,25 +99,25 @@ tnode* delete(tnode *root,int key) {   //function to delete a node
         return root;
 
 
-    if(key < root->key)                               //if key is in left sub-tree
+    if(key < root->key)                               //if key is in left sub-treap
         root->left = delete(root->left,key);
     
-    else if(key > root->key)                          //if key is in right sub-tree
+    else if(key > root->key)                          //if key is in right sub-treap
         root->right = delete(root->right, key);
     
-    else if(root->left == NULL) { 
+    else if(root->left == NULL) {                     //Key found and right child replaces current node
         tnode* temp = root->right;
         free(root);
         root=temp;
     }
     
-    else if(root->right == NULL) { 
+    else if(root->right == NULL) {                   //Key found and left child replaces current node
         tnode* temp = root->left;
         free(root);
         root=temp;
     }
     
-    else if(root->left->priority < root->right->priority) { 
+    else if(root->left->priority < root->right->priority) {  //Key found and rotations used as per priority
         root = leftrotate(root);                     
         root->left = delete(root->left, key);
     }
@@ -130,16 +130,16 @@ tnode* delete(tnode *root,int key) {   //function to delete a node
     return root;        
 }
 
-void split(tnode *root, int pivot) {
+void split(tnode *root, int pivot) { //splitting a treap
     if(search(root,pivot)!=NULL){   
-        root=delete(root,pivot);      
+        root=delete(root,pivot);      //If pivot element is present, remove it and then proceed 
         root=insert(root,pivot,0);  
-        l_root = root;             //left sub-tree including the node across which split was performed
-        r_root = root->right;      //right sub-tree
+        l_root = root;             //left sub-treap including the node across which split was performed
+        r_root = root->right;      //right sub-treap
         root->right = NULL;            
         root = NULL;
 
-        if(l_root->left!=NULL && l_root->right!=NULL){   
+        if(l_root->left!=NULL && l_root->right!=NULL){   //THe four cases for splitting such that pivot element always has max priority 
             if(l_root->left->priority>l_root->right->priority){
                 l_root->priority = l_root->left->priority + 1;
             }
@@ -160,10 +160,10 @@ void split(tnode *root, int pivot) {
             l_root->priority = 1;
         }
     }
-    else{
+    else{                       //Directly splitted as pivot element was not there in the treap
         root=insert(root,pivot,0);
-        l_root = root->left;   //left subtree
-        r_root = root->right;  //right subtree
+        l_root = root->left;   //left sub-treap
+        r_root = root->right;  //right sub-treap
         root->left = NULL;
         root->right = NULL;
     }
@@ -171,7 +171,7 @@ void split(tnode *root, int pivot) {
 
 tnode* merge(tnode *T1, tnode *T2){  //function to merge two trees splitted initially
     tnode* root;
-    if(T1==NULL){                  
+    if(T1==NULL){                  //If one of the treaps is NULL, return the other
         return T2;
     }
 
@@ -179,8 +179,8 @@ tnode* merge(tnode *T1, tnode *T2){  //function to merge two trees splitted init
         return T1;
     }
 
-    root = create_node();
-    if (T1->priority < T2->priority) {
+    root = create_node();       //New root 
+    if (T1->priority < T2->priority) { //The treaps merged as per priority
         root->key = T1->key;
         root->priority = T1->priority;
         root->left = T1->left;
@@ -240,7 +240,7 @@ void main(){
                     printf("Element not present.\n\n");
                 }
                 else {
-                    root = delete(root, key);
+                    root = delete(root, key);                   //Deletes the node
                     printf("Element successfully deleted.\n\n");
                 }
                 break;
@@ -258,20 +258,20 @@ void main(){
                 break;
             }
             case 5:{
-                inorder(root);
+                inorder(root); //Inorder traversal printing
                 printf("\n\n");
                 break;
             }
             case 6:{
-                root = merge(l_root, r_root);
-                inorder(root);
+                root = merge(l_root, r_root); //Merging the two splitted treaps
+                inorder(root); //Displaying the merged treap
                 printf("\n\n");
                 break;
             }
-            case 7:{
+            case 7:{ //To quit
                 return;
             }
-            default:{
+            default:{ //Incase of typo :)
                 printf("Wrong Input. Retry.\n");
                 break;
             }
